@@ -1,0 +1,10 @@
+services/core-api/
+├── app.py
+├── db.py
+├── deps.py
+├── search.py
+├── favorites.py
+├── events.py
+├── requirements.txt
+└── Dockerfile
+
