@@ -1,0 +1,119 @@
+# =========================
+# OS / Editor
+# =========================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+.eggs/
+
+# =========================
+# Virtual Environments
+# =========================
+.venv/
+venv/
+env/
+ENV/
+
+# =========================
+# Jupyter / Notebooks
+# =========================
+.ipynb_checkpoints/
+*.nbconvert.ipynb
+
+# =========================
+# Environment / Secrets
+# =========================
+.env
+.env.*
+*.pem
+*.key
+*.crt
+secrets/
+credentials/
+
+# =========================
+# Logs
+# =========================
+logs/
+*.log
+
+# =========================
+# SQL / Databases
+# =========================
+*.sqlite
+*.db
+*.dump
+*.sql.bak
+
+# =========================
+# Data / ML Artifacts
+# =========================
+data/raw/
+data/processed/
+data/interim/
+datasets/
+*.parquet
+*.csv
+*.tsv
+*.h5
+*.hdf5
+*.feather
+*.pickle
+*.pkl
+
+# =========================
+# Model Artifacts
+# =========================
+models/
+checkpoints/
+*.onnx
+*.pt
+*.pth
+*.joblib
+
+# =========================
+# Experiment Tracking
+# =========================
+mlruns/
+wandb/
+.neptune/
+tensorboard/
+tb_logs/
+
+# =========================
+# Docker
+# =========================
+*.tar
+*.tar.gz
+docker-compose.override.yml
+
+# =========================
+# CI / Build
+# =========================
+.cache/
+.artifacts/
+
+# =========================
+# Terraform / Infra (if applicable)
+# =========================
+.terraform/
+*.tfstate
+*.tfstate.*
