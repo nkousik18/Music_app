@@ -15,65 +15,70 @@ def get_db():
         cursorclass=pymysql.cursors.DictCursor
     )
 
-def safe_json_load(x):
-    if x is None:
-        return None
-
-    # 🔑 MySQL often returns JSON as bytes
-    if isinstance(x, (bytes, bytearray)):
-        try:
-            x = x.decode("utf-8")
-        except Exception:
-            return None
-
-    if isinstance(x, dict):
-        return x
-
-    if not isinstance(x, str):
-        return None
-
-    x = x.strip()
-    if x == "" or x.lower() == "null":
-        return None
-
-    try:
-        return json.loads(x)
-    except json.JSONDecodeError:
-        return None
-
-
+import os
+import json
+import pandas as pd
 from sqlalchemy import create_engine
 
+def safe_json_load(x):
+    try:
+        return json.loads(x) if x else None
+    except Exception:
+        return None
+
 def load_songs():
-    # 1. Use SQLAlchemy to avoid the UserWarning and improve stability
     user = os.getenv("DB_USER")
     pw = os.getenv("DB_PASSWORD")
     host = os.getenv("DB_HOST")
     db = os.getenv("DB_NAME")
-    
-    engine = create_engine(f"mysql+pymysql://{user}:{pw}@{host}/{db}")
-    
-    df = pd.read_sql("SELECT track_id, genre, popularity, audio_features FROM songs", engine)
 
-    # 2. Parse JSON
+    engine = create_engine(f"mysql+pymysql://{user}:{pw}@{host}/{db}")
+
+    # 🔑 duration_ms INCLUDED explicitly
+    df = pd.read_sql("""
+        SELECT
+            track_id,
+            genre,
+            popularity,
+            duration_ms,
+            audio_features
+        FROM songs
+        WHERE audio_features IS NOT NULL
+    """, engine)
+
+    # Parse JSON safely
     df["audio_features"] = df["audio_features"].apply(safe_json_load)
 
-    # 3. Drop nulls AND reset index (CRITICAL)
+    # Drop rows where JSON failed
     df = df.dropna(subset=["audio_features"]).reset_index(drop=True)
 
-    # 4. Normalize and Concat
+    # Normalize JSON → columns
     audio_df = pd.json_normalize(df["audio_features"])
-    
-    # Since indices are reset, they will align perfectly
-    df = pd.concat([df.drop(columns=["audio_features"]), audio_df], axis=1)
+
+    # Merge
+    df = pd.concat(
+        [df.drop(columns=["audio_features"]), audio_df],
+        axis=1
+    )
 
     return df
+
+
+from sqlalchemy import create_engine
+import os
 
 def load_events():
-    conn = get_db()
-    df = pd.read_sql("""
-        SELECT user_id, track_id, event_type, ts
-        FROM user_events
-    """, conn)
-    conn.close()
+    user = os.getenv("DB_USER")
+    pw = os.getenv("DB_PASSWORD")
+    host = os.getenv("DB_HOST")
+    db = os.getenv("DB_NAME")
+
+    engine = create_engine(f"mysql+pymysql://{user}:{pw}@{host}/{db}")
+
+    df = pd.read_sql(
+        "SELECT user_id, track_id, event_type, ts FROM user_events",
+        engine
+    )
+
     return df
+

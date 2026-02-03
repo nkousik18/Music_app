@@ -1,10 +1,3 @@
-from utils import load_songs
-
-df = load_songs()
-print(df.columns.tolist())
-print(df.head(1).to_dict())
-
-
 from utils import load_songs, load_events
 
 songs = load_songs()
